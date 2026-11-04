@@ -1,4 +1,5 @@
 import 'package:artemis/generator/data/data.dart';
+import 'package:build_test/build_test.dart';
 import 'package:test/test.dart';
 
 import '../helpers.dart';
@@ -29,7 +30,8 @@ void main() {
           ],
         },
         outputsMap: {
-          'a|lib/query.graphql.dart': generatedFile,
+          'a|lib/query.graphql.dart':
+              decodedMatches(equalsDartCode(generatedFile)),
           'a|lib/query.dart': r'''// GENERATED CODE - DO NOT MODIFY BY HAND
 export 'query.graphql.dart';
 ''',

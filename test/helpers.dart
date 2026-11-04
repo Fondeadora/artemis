@@ -6,6 +6,69 @@ import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 import 'package:collection/collection.dart';
 
+/// Runs [testBuilder] and rethrows the first error the builder raised.
+///
+/// Since build_test 3, `testBuilder` logs a builder's exception (as text)
+/// and returns a failed result instead of throwing it, so the builder is
+/// wrapped to keep the original exception object.
+Future<TestBuilderResult> testBuilderRethrowing(
+  Builder builder,
+  Map<String, Object> sourceAssets, {
+  Map<String, Object>? outputs,
+}) async {
+  final capturing = _ErrorCapturingBuilder(builder);
+  final result = await testBuilder(
+    capturing,
+    sourceAssets,
+    outputs: outputs,
+    onLog: print,
+  );
+  final error = capturing.error;
+  if (error != null) throw error;
+  return result;
+}
+
+class _ErrorCapturingBuilder implements Builder {
+  _ErrorCapturingBuilder(this._inner);
+
+  final Builder _inner;
+  Object? error;
+
+  @override
+  Map<String, List<String>> get buildExtensions => _inner.buildExtensions;
+
+  @override
+  Future<void> build(BuildStep buildStep) async {
+    try {
+      await _inner.build(buildStep);
+    } catch (e) {
+      error ??= e;
+      rethrow;
+    }
+  }
+}
+
+/// Matches Dart source ignoring layout: whitespace and trailing commas.
+///
+/// The generator formats its output with `dart_style`, whose layout changes
+/// between major versions (e.g. the "tall" style of 3.x). These tests check
+/// what is generated, not how the formatter lays it out.
+Matcher equalsDartCode(String expected) => _DartCodeMatcher(expected);
+
+String _normalizeDartCode(String code) => code
+    .replaceAll(RegExp(r'\s+'), '')
+    .replaceAllMapped(RegExp(r',([)\]}])'), (m) => m[1]!);
+
+class _DartCodeMatcher extends CustomMatcher {
+  _DartCodeMatcher(String expected)
+      : super('Dart code equal (ignoring layout) to', 'normalized code',
+            _normalizeDartCode(expected));
+
+  @override
+  Object? featureValueOf(dynamic actual) =>
+      _normalizeDartCode(actual as String);
+}
+
 final bool Function(Iterable, Iterable) listEquals =
     const DeepCollectionEquality.unordered().equals;
 
@@ -52,7 +115,7 @@ Future testGenerator({
       ...sourceAssetsMap,
     },
     outputs: {
-      'a|lib/query.graphql.dart': generatedFile,
+      'a|lib/query.graphql.dart': decodedMatches(equalsDartCode(generatedFile)),
       ...outputsMap,
     },
     onLog: print,

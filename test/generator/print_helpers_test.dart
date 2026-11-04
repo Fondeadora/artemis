@@ -4,6 +4,8 @@ import 'package:artemis/generator/print_helpers.dart';
 import 'package:gql/language.dart';
 import 'package:test/test.dart';
 
+import '../helpers.dart';
+
 void main() {
   group('On printCustomEnum', () {
     test('It will throw if name is empty.', () {
@@ -42,7 +44,7 @@ void main() {
 
       final str = specToString(enumDefinitionToSpec(definition));
 
-      expect(str, '''enum Name {
+      expect(str, equalsDartCode('''enum Name {
   @JsonValue('Option')
   option,
   @JsonValue('anotherOption')
@@ -52,7 +54,7 @@ void main() {
   @JsonValue('FORTH_OPTION')
   forthOption,
 }
-''');
+'''));
     });
 
     test('It will ignore duplicate options.', () {
@@ -73,13 +75,13 @@ void main() {
 
       final str = specToString(enumDefinitionToSpec(definition));
 
-      expect(str, '''enum Name {
+      expect(str, equalsDartCode('''enum Name {
   @JsonValue('Option')
   option,
   @JsonValue('AnotherOption')
   anotherOption,
 }
-''');
+'''));
     });
   });
 
@@ -110,14 +112,14 @@ void main() {
 
       final str = specToString(fragmentClassDefinitionToSpec(definition));
 
-      expect(str, '''mixin FragmentMixin {
+      expect(str, equalsDartCode('''mixin FragmentMixin {
   Type? name;
   @override
   Type? name;
   @Test
   Type? name;
 }
-''');
+'''));
     });
   });
 
@@ -141,7 +143,7 @@ void main() {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin {
   AClass();
 
@@ -152,7 +154,7 @@ class AClass extends JsonSerializable with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
 
     test('"Mixins" will be included to class.', () {
@@ -163,7 +165,7 @@ class AClass extends JsonSerializable with EquatableMixin {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends AnotherClass with EquatableMixin {
   AClass();
 
@@ -174,7 +176,7 @@ class AClass extends AnotherClass with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
 
     test(
@@ -192,7 +194,7 @@ class AClass extends AnotherClass with EquatableMixin {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, r'''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode(r'''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin {
   AClass();
 
@@ -221,7 +223,7 @@ class AClass extends JsonSerializable with EquatableMixin {
     return _$AClassToJson(this);
   }
 }
-''');
+'''));
     });
 
     test('It can have properties.', () {
@@ -237,7 +239,7 @@ class AClass extends JsonSerializable with EquatableMixin {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin {
   AClass();
 
@@ -252,7 +254,7 @@ class AClass extends JsonSerializable with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
 
     test(
@@ -279,7 +281,7 @@ class AClass extends JsonSerializable with EquatableMixin {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin {
   AClass();
 
@@ -302,7 +304,7 @@ class AClass extends JsonSerializable with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
 
     test(
@@ -323,7 +325,7 @@ class AClass extends JsonSerializable with EquatableMixin {
             ])
       ], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin, FragmentMixin {
   AClass();
 
@@ -334,7 +336,7 @@ class AClass extends JsonSerializable with EquatableMixin, FragmentMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
 
     test('It can be an input object (and have a named parameter constructor).',
@@ -354,7 +356,7 @@ class AClass extends JsonSerializable with EquatableMixin, FragmentMixin {
 
       final str = specToString(classDefinitionToSpec(definition, [], []));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class AClass extends JsonSerializable with EquatableMixin {
   AClass({
     this.name,
@@ -372,7 +374,7 @@ class AClass extends JsonSerializable with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$AClassToJson(this);
 }
-''');
+'''));
     });
   });
 
@@ -422,13 +424,14 @@ class AClass extends JsonSerializable with EquatableMixin {
       final ignoreForFile = <String>[];
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 part 'test_query.graphql.g.dart';
-''');
+'''));
     });
 
     test('When there are custom imports, they are included.', () {
@@ -439,14 +442,15 @@ part 'test_query.graphql.g.dart';
 
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 import 'some_file.dart';
 part 'test_query.graphql.g.dart';
-''');
+'''));
     });
 
     test('When generateHelpers is true, an execute fn is generated.', () {
@@ -466,7 +470,8 @@ part 'test_query.graphql.g.dart';
 
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:artemis/artemis.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -499,7 +504,7 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, JsonSerializable> {
   @override
   TestQuery parse(Map<String, dynamic> json) => TestQuery.fromJson(json);
 }
-''');
+'''));
     });
 
     test(
@@ -522,7 +527,8 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, JsonSerializable> {
 
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
@@ -539,7 +545,7 @@ final TEST_QUERY_QUERY_DOCUMENT = DocumentNode(definitions: [
     selectionSet: SelectionSetNode(selections: []),
   )
 ]);
-''');
+'''));
     });
 
     test('The generated execute fn could have input.', () {
@@ -562,7 +568,8 @@ final TEST_QUERY_QUERY_DOCUMENT = DocumentNode(definitions: [
 
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), r'''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode(r'''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:artemis/artemis.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -614,7 +621,7 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, TestQueryArguments> {
   @override
   TestQuery parse(Map<String, dynamic> json) => TestQuery.fromJson(json);
 }
-''');
+'''));
     });
 
     test('Will generate an Arguments class', () {
@@ -631,7 +638,7 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, TestQueryArguments> {
 
       final str = specToString(generateArgumentClassSpec(definition));
 
-      expect(str, '''@JsonSerializable(explicitToJson: true)
+      expect(str, equalsDartCode('''@JsonSerializable(explicitToJson: true)
 class TestQueryArguments extends JsonSerializable with EquatableMixin {
   TestQueryArguments({this.name});
 
@@ -646,7 +653,7 @@ class TestQueryArguments extends JsonSerializable with EquatableMixin {
   @override
   Map<String, dynamic> toJson() => _\$TestQueryArgumentsToJson(this);
 }
-''');
+'''));
     });
 
     test('Will generate a Query Class', () {
@@ -665,8 +672,10 @@ class TestQueryArguments extends JsonSerializable with EquatableMixin {
       final str = specToString(generateQuerySpec(definition)) +
           specToString(generateQueryClassSpec(definition));
 
-      expect(str,
-          r'''final TEST_QUERY_QUERY_DOCUMENT_OPERATION_NAME = 'test_query';
+      expect(
+          str,
+          equalsDartCode(
+              r'''final TEST_QUERY_QUERY_DOCUMENT_OPERATION_NAME = 'test_query';
 final TEST_QUERY_QUERY_DOCUMENT = DocumentNode(definitions: [
   OperationDefinitionNode(
     type: OperationType.query,
@@ -693,7 +702,7 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, TestQueryArguments> {
   @override
   TestQuery parse(Map<String, dynamic> json) => TestQuery.fromJson(json);
 }
-''');
+'''));
     });
 
     test('It will accept and write class/enum definitions.', () {
@@ -718,7 +727,8 @@ class TestQueryQuery extends GraphQLQuery<TestQuery, TestQueryArguments> {
 
       writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-      expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+      expect(buffer.toString(),
+          equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
@@ -741,7 +751,7 @@ enum SomeEnum {
   @JsonValue('Value')
   value,
 }
-''');
+'''));
     });
   });
 
@@ -752,13 +762,14 @@ enum SomeEnum {
 
     writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-    expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+    expect(buffer.toString(),
+        equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 part 'test_query.graphql.g.dart';
-''');
+'''));
   });
 
   test('Should not add ignore_for_file when ignoreForFile is empty', () {
@@ -768,13 +779,14 @@ part 'test_query.graphql.g.dart';
 
     writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-    expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+    expect(buffer.toString(),
+        equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 part 'test_query.graphql.g.dart';
-''');
+'''));
   });
 
   test('Should add // ignore_for_file: ... when ignoreForFile is not empty',
@@ -785,13 +797,14 @@ part 'test_query.graphql.g.dart';
 
     writeLibraryDefinitionToBuffer(buffer, ignoreForFile, definition);
 
-    expect(buffer.toString(), '''// GENERATED CODE - DO NOT MODIFY BY HAND
+    expect(buffer.toString(),
+        equalsDartCode('''// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: my_rule_1, my_rule_2
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gql/ast.dart';
 part 'test_query.graphql.g.dart';
-''');
+'''));
   });
 }
