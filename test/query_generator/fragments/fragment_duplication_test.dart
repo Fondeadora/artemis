@@ -32,7 +32,7 @@ void main() {
         builderOptionsMap: {'fragments_glob': '**.frag'},
         sourceAssetsMap: {
           'a|fragment.frag': fragmentsString,
-          'a|queries/another_query.graphql': anotherQueryString,
+          'a|queries/query_another.graphql': anotherQueryString,
         },
       ),
     );

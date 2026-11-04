@@ -5,6 +5,8 @@ import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
 import 'package:test/test.dart';
 
+import '../../helpers.dart';
+
 void main() {
   group('Multiple schema mapping', () {
     test(
@@ -51,8 +53,10 @@ void main() {
             'a|queries/queryB.graphql': queryB,
           },
           outputs: {
-            'a|lib/outputA.graphql.dart': generatedFileA,
-            'a|lib/outputB.graphql.dart': generatedFileB,
+            'a|lib/outputA.graphql.dart':
+                decodedMatches(equalsDartCode(generatedFileA)),
+            'a|lib/outputB.graphql.dart':
+                decodedMatches(equalsDartCode(generatedFileB)),
           },
           onLog: print,
         );

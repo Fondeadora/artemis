@@ -1,8 +1,9 @@
 import 'package:artemis/builder.dart';
 import 'package:artemis/generator/errors.dart';
 import 'package:build/build.dart';
-import 'package:build_test/build_test.dart';
 import 'package:test/test.dart';
+
+import '../../helpers.dart';
 
 void main() {
   group('On errors', () {
@@ -19,7 +20,7 @@ void main() {
       }));
 
       expect(
-        () => testBuilder(
+        () => testBuilderRethrowing(
           anotherBuilder,
           {
             'a|api.schema.graphql': '''
@@ -30,7 +31,6 @@ void main() {
             'a|lib/queries/some_query.graphql':
                 'query { ...nonExistentFragment }',
           },
-          onLog: print,
         ),
         throwsA(predicate((e) =>
             e is MissingFragmentException &&

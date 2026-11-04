@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 7.14.0
+
+- Support Dart 3.13 / Flutter 3.47: drop the unused `source_gen` dependency and move to `analyzer` 8+ through `build ^4`, `dart_style ^3` and `gql_code_builder ^0.15`. `analyzer` 6.x needed the `_macros` SDK package, which newer Dart SDKs no longer ship.
+- `DartFormatter` is created with `languageVersion: DartFormatter.latestLanguageVersion` (required by `dart_style` 3).
+- The `.graphql` files a glob matches are read sorted by path, so the generated file keeps the same order across runs (`build` 4 returns them in no particular order).
+
 ## 7.13.1
 
 - Move `beta` version out of beta for pub.dev awareness

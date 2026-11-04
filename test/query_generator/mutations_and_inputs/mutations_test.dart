@@ -39,7 +39,7 @@ void main() {
         generatedFile: generatedFile,
         generateHelpers: true,
         sourceAssetsMap: {
-          'a|queries/another_query.graphql': anotherQuery,
+          'a|queries/query_another.graphql': anotherQuery,
         },
       ),
     );

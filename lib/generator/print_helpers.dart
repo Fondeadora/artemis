@@ -428,7 +428,8 @@ Spec generateLibrarySpec(LibraryDefinition definition) {
 /// Emit a [Spec] into a String, considering Dart formatting.
 String specToString(Spec spec) {
   final emitter = DartEmitter();
-  return DartFormatter().format(spec.accept(emitter).toString());
+  return DartFormatter(languageVersion: DartFormatter.latestLanguageVersion)
+      .format(spec.accept(emitter).toString());
 }
 
 /// Generate Dart code typings from a query or mutation and its response from

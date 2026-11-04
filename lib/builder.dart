@@ -77,16 +77,19 @@ class GraphQLQueryBuilder implements Builder {
     BuildStep buildStep,
     String schema,
   ) async {
-    final schemaAssetStream = buildStep.findAssets(Glob(schema));
+    // `findAssets` makes no promise about order (build 4 returns them in an
+    // arbitrary one), so sort by path to keep the generated file stable.
+    final assets = await buildStep.findAssets(Glob(schema)).toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
 
-    return await schemaAssetStream
-        .asyncMap(
-          (asset) async => parseString(
-            await buildStep.readAsString(asset),
-            url: asset.path,
-          ),
-        )
-        .toList();
+    return Future.wait(
+      assets.map(
+        (asset) async => parseString(
+          await buildStep.readAsString(asset),
+          url: asset.path,
+        ),
+      ),
+    );
   }
 
   @override
